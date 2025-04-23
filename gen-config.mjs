@@ -26,4 +26,4 @@ const config = {
 const outDir = '/config/configuration';
 fs.mkdirSync(outDir, { recursive: true });
 const content = `export default ${JSON.stringify(config, null, 2)};\n`;
-fs.writeFileSync(path.join(outDir, `${process.env.NODE_ENV || 'development'}.mjs`), content);
+fs.writeFileSync(path.join(outDir, `${process.env.NODE_ENV || 'production'}.mjs`), content);

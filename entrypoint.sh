@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-CONFIG_FILE="/config/configuration/${NODE_ENV:-development}.mjs"
+CONFIG_FILE="/config/configuration/${NODE_ENV:-production}.mjs"
 
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "No config found at $CONFIG_FILE, generating from environment..."
