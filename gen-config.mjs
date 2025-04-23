@@ -1,29 +1,56 @@
 #!/usr/bin/env node
-// Generate ESM config file from environment variables
+/**
+ * Configuration generator for Kill the Newsletter
+ * This script generates a configuration file from environment variables
+ */
+
 import fs from 'fs';
 import path from 'path';
 
+// Environment variables with defaults
+const domain = process.env.DOMAIN || 'localhost';
+const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+const storagePath = process.env.STORAGE_PATH || '/config/storage';
+const nodeEnv = process.env.NODE_ENV || 'production';
+const certDir = process.env.CERT_OUTPUT_DIR || '/app/certs';
+const configPath = process.env.CONFIG_PATH || '/config/configuration.mjs';
+const hstsPreload = process.env.HSTS_PRELOAD === 'true';
+const extraCaddyfile = process.env.EXTRA_CADDYFILE || null;
+
+// Create configuration object
 const config = {
-  server: {
-    hostname: process.env.HOSTNAME || '0.0.0.0',
-    port: Number(process.env.PORT || 3000),
-    secret: process.env.SECRET_KEY || 'CHANGE_ME',
+  hostname: domain,
+  systemAdministratorEmail: adminEmail,
+  tls: {
+    key: path.join(certDir, `${domain}.key`),
+    certificate: path.join(certDir, `${domain}.crt`),
   },
-  email: {
-    host: process.env.SMTP_HOST || 'smtp.example.com',
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER || 'user@example.com',
-      pass: process.env.SMTP_PASS || 'password',
-    },
-  },
-  storage: {
-    path: '/config/storage',
-  },
+  dataDirectory: storagePath,
+  environment: nodeEnv
 };
 
-const outDir = '/config/configuration';
-fs.mkdirSync(outDir, { recursive: true });
-const content = `export default ${JSON.stringify(config, null, 2)};\n`;
-fs.writeFileSync(path.join(outDir, `${process.env.NODE_ENV || 'production'}.mjs`), content);
+// Add optional parameters if they exist
+if (hstsPreload) {
+  config.hstsPreload = true;
+}
+
+if (extraCaddyfile) {
+  config.extraCaddyfile = extraCaddyfile;
+}
+
+// Ensure config directory exists
+const configDir = path.dirname(configPath);
+if (!fs.existsSync(configDir)) {
+  fs.mkdirSync(configDir, { recursive: true });
+}
+
+// Write configuration to file
+const configContent = `// Generated configuration for Kill the Newsletter
+// Domain: ${domain}
+// Generated: ${new Date().toISOString()}
+
+export default ${JSON.stringify(config, null, 2)};
+`;
+
+fs.writeFileSync(configPath, configContent);
+console.log(`Configuration generated at ${configPath}`);
