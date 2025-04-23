@@ -9,4 +9,4 @@ else
   echo "Using existing config file at $CONFIG_FILE"
 fi
 
-exec npm start
+exec node ./build/index.mjs ./configuration/${NODE_ENV:-production}.mjs
