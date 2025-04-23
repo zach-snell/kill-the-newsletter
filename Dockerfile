@@ -43,7 +43,9 @@
   
   ENTRYPOINT ["/usr/bin/tini", "--", "/app/entrypoint.sh"]
   
-  # Symlink config dir
+  # Remove the configuration directory copied from the builder stage first
+  RUN rm -rf /app/configuration
+  # Now, correctly create the symlink pointing to the volume root
   RUN ln -s /config /app/configuration
   
   VOLUME ["/config"]

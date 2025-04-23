@@ -9,4 +9,5 @@ else
   echo "Using existing config file at $CONFIG_FILE"
 fi
 
-exec node ./build/index.mjs ./configuration/${NODE_ENV:-production}.mjs
+# Pass the absolute path to the node application
+exec node ./build/index.mjs "$CONFIG_FILE"
